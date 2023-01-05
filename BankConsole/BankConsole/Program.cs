@@ -1,7 +1,9 @@
-﻿using System;
+﻿using BankConsole.Observer;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 
@@ -11,48 +13,51 @@ namespace BankConsole
     {
         GrnToDollar,
         GrnToEuro,
-        DollarToGrn,
-        EuroToGrn,
-        EuroToDollar,
-        DollarToEuro
+        DolToGrn,
+        EurToGrn,
+        EurToDollar,
+        DolToEuro
     }
     class Program
     {
         #region Methods
         static void Main(string[] args)
         {
+            CBank bank = new CBank();
+            CComputer computer = new CComputer();
+            CConsultant consultant = new CConsultant("Larisa", 20);
             ReportBankSingleton reportBankSingleton1 = ReportBankSingleton.GetInstance();
-            CCustomer costumer4 = new CCustomer("Vlad", 25, 12000, 4000, 200);
-            CCustomer costumer1 = new CCustomer("Vadim", 25, 12000, 4000, 200);
-            CCustomer costumer2 = new CCustomer("Misha", 25, 12000, 4000, 200);
-            CCustomer costumer3 = new CCustomer("Kolya", 25, 12000, 4000, 200);
+            ReportBankSingleton reportBankSingleton2 = ReportBankSingleton.GetInstance1();
+            CEmployee employee = new CEmployee("Vasia", 35, computer, reportBankSingleton1);
+            CVinnik vinik = new CVinnik();
+            CClinerMan clinerMan = new CClinerMan("Olya", 18, 2, vinik, reportBankSingleton2);
+            
+            CCustomer costumer4 = new CCustomer("Vlad", 25, 12000, 4000, 200,clinerMan);
+            CCustomer costumer1 = new CCustomer("Vadim", 25, 12000, 4000, 200,clinerMan);
+            CCustomer costumer2 = new CCustomer("Misha", 25, 12000, 4000, 200,clinerMan);
+            CCustomer costumer3 = new CCustomer("Kolya", 25, 12000, 4000, 200,clinerMan);
             List<CCustomer> costumers = new List<CCustomer>() { costumer4, costumer1, costumer2, costumer3 };
-            CBank.Hello();
-            int a = Convert.ToInt32(Console.ReadLine());
-            if (a == 1)
+            foreach (var item in costumers)
             {
-                CBank bank = new CBank();
-                CComputer computer = new CComputer();
-                CVinnik vinik = new CVinnik();
-                CClinerMan clinerMan = new CClinerMan("Olya", 18, 2,vinik,reportBankSingleton1);
-                int Hp = vinik.Hp;
-                CEmployee employee = new CEmployee("Vasia", 35, computer,reportBankSingleton1);
-                CConsultant consultant = new CConsultant("Larisa", 20);
-                foreach (var item in costumers)
+                CBank.Hello();
+                int a = Convert.ToInt32(Console.ReadLine());
+                if (a == 1)
                 {
-                    Console.WriteLine(item.Name);
-                    item.Work(consultant, employee, bank);
-                    Console.WriteLine($"Goodbye {item.Name}!");
+                    {
+                        Console.WriteLine(item.Name);
+                        item.Work(consultant, employee, bank);
+                        Console.WriteLine($"Goodbye {item.Name}!");
+                    }
+
+                    CBank.ProcentD = clinerMan.Cline(CBank.ProcentD);
+                    reportBankSingleton1.PrintReport();
+                    reportBankSingleton2.PrintReport();
+
                 }
-                
-                CBank.ProcentD = clinerMan.Cline(CBank.ProcentD);
-                vinik.Hp = Hp;
-                reportBankSingleton1.PrintReport();
-                
-            }
-            if (a == 2)
-            {
-                Console.WriteLine($"Goodbye! ");
+                if (a == 2)
+                {
+                    Console.WriteLine($"Goodbye! ");
+                }
             }
         }
         #endregion 
@@ -61,9 +66,19 @@ namespace BankConsole
     {
         #region Fields and properties
         static ReportBankSingleton _instance;
-        public List<string> Report { get; set; }
-       
+        static ReportBankSingleton _instance2;
+        public List<string> Report { get; private set; }
+
+        internal ReportBankSingleton ReportBankSingleton1
+        {
+            get => default;
+            set
+            {
+            }
+        }
+
         #endregion
+
         #region Constructors
         private ReportBankSingleton()
         {
@@ -76,6 +91,15 @@ namespace BankConsole
                 _instance.Report = new List<string>();
             }
             return _instance;
+        }
+        public static ReportBankSingleton GetInstance1()
+        {
+            if (_instance2 == null)
+            {
+                _instance2 = new ReportBankSingleton();
+                _instance2.Report = new List<string>();
+            }
+            return _instance2;
         }
         #endregion
         #region Methods
@@ -106,16 +130,17 @@ namespace BankConsole
         }
         #endregion
         #region Methods
-        public void Operation1(CurrencyExchange currency,CCustomer costumer,double Bank,string GetMoney,
-                               string ResultMoney)
+        public void Operation1(CurrencyExchange currency,CCustomer costumer,double Bank)
         {
             _employee.Question2(currency);
             double customerStartMoney = float.Parse(Console.ReadLine());
             double customerResultMoney = _employee.Exchange(currency, customerStartMoney,costumer);
             if (customerResultMoney <= Bank)
             {
-                Console.WriteLine("You get " + customerStartMoney + " " + GetMoney + " and received " +
-                                  + customerResultMoney + " " + ResultMoney);
+                string getmoney = currency.ToString().Substring(0,3);
+                string resultmoney = currency.ToString().Substring(5);
+                Console.WriteLine("You get " + customerStartMoney + " " + getmoney + " and received " +
+                                  + customerResultMoney + " " + resultmoney);
             }
             else
             {
@@ -124,26 +149,17 @@ namespace BankConsole
         }
         public void Operation2(double[] procent)
         {
+            double[] depoziteParsent = { 0.15, 0.17, 0.20 };
             int punct2 = Convert.ToInt32(Console.ReadLine());
-            switch (punct2)
+            if (punct2 >= 1 && punct2 <= 3)
             {
-                case 0:
-                    Console.WriteLine("Goodbye! ");
-                    break;
-                case 1:
-                    Operation2Dod(0.15);
-                    break;
-                case 2:
-                    Operation2Dod(0.17);
-                    break;
-                case 3:
-                    Operation2Dod(0.20);
-                    break;
-                default:
-                    Console.WriteLine("It's imposible!");//це неможливо
-                    return;
+                Operation2Dod(depoziteParsent[punct2 - 1]);
             }
-
+            else
+            {
+                Console.WriteLine("It's imposible!");//це неможливо
+                return;
+            }
             void Operation2Dod(double procent)
             {
                 Console.WriteLine("Enter the amount of your deposit in hryvnias:");//Вкажіть суму вашого вкладу в гривнях
@@ -163,6 +179,59 @@ namespace BankConsole
                 }
             }
         }
+        public void OperationExchangeMoney(CEmployee employee,CCustomer customer)
+        {
+            Random random = new Random();
+            employee.ExchangeOfMoney();
+            int punct1 = Convert.ToInt32(Console.ReadLine());
+            if (punct1 >= 1 && punct1 <= 6)
+            {
+                Operation1((CurrencyExchange)(punct1 - 1), customer, random.Next(1000, 2147483647));
+            }
+            else
+            {
+                Console.WriteLine("It's imposible!");//це неможливо
+                return;
+            }
+        }
+        public void OperationConribut(CEmployee employee)
+        {
+            double[] arr = new double[3] { 0.15, 0.17, 0.20 };
+
+            employee.ContributionOfMoney();
+            Operation2(arr);
+        }
+        public void OperationLoad(CEmployee employee)
+        {
+            employee.Loan();
+            int punct3 = Convert.ToInt32(Console.ReadLine());
+            switch (punct3)
+            {
+                case 0:
+                    Console.WriteLine("Goodbye! ");
+                    break;
+                case 1:
+                    CDialogs.AboutLoan();
+                    break;
+                default:
+                    Console.WriteLine("It's imposible!");//це неможливо
+                    return;
+            }
+        }
+        public void OperaionRefill(CEmployee employee)
+        {
+            employee.Refill();
+            int punct4 = Convert.ToInt32(Console.ReadLine());
+            switch (punct4)
+            {
+                case 0:
+                    Console.WriteLine("Goodbye! ");
+                    break;
+                case 1:
+                    CDialogs.AboutReplenishment();
+                    break;
+            }
+        }
         #endregion
     }
     abstract class CPerson
@@ -179,12 +248,13 @@ namespace BankConsole
         }
         #endregion
     }
-    class CCustomer : CPerson
+    class CCustomer : CPerson,IObserver
     {
         #region Fields and properties
         public int Grivnas { get; set; }
         public int Euros { get; set; }
         public int Dollars { get; set; }
+        private IObservable observable;
         internal CBank CBank
         {
             get => default;
@@ -194,11 +264,13 @@ namespace BankConsole
         }
         #endregion
         #region Constructors
-        public CCustomer(string name, int age, int grivnas, int euros, int dollars) : base(name, age)
+        public CCustomer(string name, int age, int grivnas, int euros, int dollars, IObservable obj) : base(name, age)
         {
             Grivnas = grivnas;
             Euros = euros;
             Dollars = dollars;
+            this.observable = obj;
+            obj.AddObserver(this);
         }
         #endregion
         #region Methods
@@ -223,6 +295,12 @@ namespace BankConsole
                     check = false;
                 }
             }
+        }
+
+        public void Update()
+        {
+            Console.WriteLine("CLINE END -> (Observer)");
+            observable.RemoveObserver(this);
         }
         #endregion
     }
@@ -300,6 +378,7 @@ namespace BankConsole
         #region Methods
         public void Dialog(CCustomer customer,CConsultant consultant)
         {
+            Random random= new Random();
             Facade facade = new Facade(this);
             consultant.Consult();
             int punct = Convert.ToInt32(Console.ReadLine());
@@ -309,76 +388,22 @@ namespace BankConsole
                     break;
                 #region Case1
                 case 1:
-                    ExchangeOfMoney();
-                    int punct1 = Convert.ToInt32(Console.ReadLine());
-                    switch (punct1)
-                    {
-                        case 0:
-                            Console.WriteLine("Goodbye! ");
-                            break;
-                        case 1:
-                            facade.Operation1( CurrencyExchange.GrnToDollar, customer, 65535, "grn", "dollars");
-                            break;
-                        case 2:
-                            facade.Operation1( CurrencyExchange.GrnToEuro, customer, 1287, "grn", "euros");
-                            break;
-                        case 3:
-                            facade.Operation1(CurrencyExchange.DollarToGrn, customer, 2147483647, "dollars", "grn");
-                            break;
-                        case 4:
-                            facade.Operation1( CurrencyExchange.EuroToGrn, customer, 2147483647, "euros", "grn");
-                            break;
-                        case 5:
-                            facade.Operation1( CurrencyExchange.EuroToDollar, customer, 65535, "euros", "dollars");
-                            break;
-                        case 6:
-                            facade.Operation1( CurrencyExchange.DollarToEuro, customer, 1287, "dollars", "euros");
-                            break;
-                        default:
-                            Console.WriteLine("It's imposible!");//це неможливо
-                            return;
-                    }
+                    facade.OperationExchangeMoney(this,customer);
                     break;
                 #endregion
                 #region Case2
                 case 2:
-                    double[] arr = new double[3] { 0.15, 0.17, 0.20 };
-
-                    ContributionOfMoney();
-                    facade.Operation2(arr);
+                    facade.OperationConribut(this);
                     break;
                 #endregion
                 #region Case3
                 case 3:
-                    Loan();
-                    int punct3 = Convert.ToInt32(Console.ReadLine());
-                    switch (punct3)
-                    {
-                        case 0:
-                            Console.WriteLine("Goodbye! ");
-                            break;
-                        case 1:
-                            CDialogs.AboutLoan();
-                            break;
-                        default:
-                            Console.WriteLine("It's imposible!");//це неможливо
-                            return;
-                    }
+                    facade.OperationLoad(this);
                     break;
                 #endregion
                 #region Case4
                 case 4:
-                    Refill();
-                    int punct4 = Convert.ToInt32(Console.ReadLine());
-                    switch (punct4)
-                    {
-                        case 0:
-                            Console.WriteLine("Goodbye! ");
-                            break;
-                        case 1:
-                            CDialogs.AboutReplenishment();
-                            break;
-                    }
+                    facade.OperaionRefill(this);
                     break;
                     #endregion
             }
@@ -391,36 +416,31 @@ namespace BankConsole
                 case CurrencyExchange.GrnToDollar:
                     _dollarAmount -= resultAmount;
                     _grnAmount += customerStartMoney;
-                    LocalExchange();
                     break;
                 case CurrencyExchange.GrnToEuro:
                     _euroAmount -= resultAmount;
                     _grnAmount += customerStartMoney;
-                    LocalExchange();
                     break;
-                case CurrencyExchange.DollarToGrn:
+                case CurrencyExchange.DolToGrn:
                     _dollarAmount += customerStartMoney;
                     _grnAmount -= resultAmount;
-                    LocalExchange();
                     break;
-                case CurrencyExchange.EuroToGrn:
+                case CurrencyExchange.EurToGrn:
                     _euroAmount += resultAmount;
                     _grnAmount -= customerStartMoney;
-                    LocalExchange();
                     break;
-                case CurrencyExchange.EuroToDollar:
+                case CurrencyExchange.EurToDollar:
                     _euroAmount += resultAmount;
                     _dollarAmount -= customerStartMoney;
-                    LocalExchange();
                     break;
-                case CurrencyExchange.DollarToEuro:
+                case CurrencyExchange.DolToEuro:
                     _dollarAmount += customerStartMoney;
                     _euroAmount -= resultAmount;
-                    LocalExchange();
                     break;
                 default:
                     return 0;
             }
+            LocalExchange();
             void LocalExchange()
             {
                 Report.Add($"Name:{costumer.Name} Start Money: {customerStartMoney} Result: {resultAmount} Date:" +
@@ -489,25 +509,10 @@ namespace BankConsole
                 int kredit = Convert.ToInt32(Console.ReadLine());
                 Console.WriteLine("For what term do you take a loan?( 10, 20, 36 month)");//На який термін ви берете кредит?
                 int _termin = Convert.ToInt32(Console.ReadLine());
-                if (kredit >= 5000 && kredit <= 100000)
+                if (kredit >= 5000 && kredit <= 100000 && (_termin == 10 || _termin == 20 || _termin == 36))
                 {
-                    if (_termin == 10)
-                    {
-                        double Kredit1 = ((kredit * 0.015) + kredit) / 10;
-                        Console.WriteLine("Payment for the loan per month is:   " + Kredit1 + "grn");
-                    }
-
-                    if (_termin == 20)
-                    {
-                        double Kredit2 = ((kredit * 0.015) + kredit) / 20;
-                        Console.WriteLine("Payment for the loan per month is:   " + Kredit2 + "grn");
-                    }
-
-                    if (_termin == 36)
-                    {
-                        double Kredit3 = ((kredit * 0.015) + kredit) / 36;
-                        Console.WriteLine("Payment for the loan per month is:   " + Kredit3 + "grn");
-                    }
+                    double Kredit1 = ((kredit * 0.015) + kredit) / _termin;
+                    Console.WriteLine("Payment for the loan per month is:   " + Kredit1 + "grn");
                 }
                 else
                 {
@@ -568,13 +573,14 @@ namespace BankConsole
         }
         #endregion
     }
-    class CClinerMan : CPerson
+    class CClinerMan : CPerson, IObservable
     {
         #region Fields and properties
 
         public int ClinerPower { get; set; }
         public CVinnik Vinik { get; set; }
-        public ReportBankSingleton _reports; 
+        public ReportBankSingleton _reports;
+        private List<IObserver> observers;
         internal CVinnik CVinnik
         {
             get => default;
@@ -591,17 +597,19 @@ namespace BankConsole
             }
         }
         #endregion
-        #region Methods
-
+        #region Constructors
         public CClinerMan(string name, int age, int clinerPower, CVinnik vinik,ReportBankSingleton report) : base(name, age)
         {
             ClinerPower = clinerPower;
             Vinik = vinik;
             _reports = report;
+            observers = new List<IObserver>();
         }
-
+        #endregion
+         #region Methods
         public int Cline(int procentD)
         {
+            
             string report="";
             report += $"Before Dirty: {procentD}\n";
             while (procentD - (Vinik.Power + ClinerPower) >= 0)
@@ -620,12 +628,37 @@ namespace BankConsole
             }
             report += $"Cline end\n";
             report += $"After Dirty: {procentD}\n";
-            _reports.Report.Add(report);
+            _reports.AddReport(report);
+            Notify();
             return procentD;
+        }
 
+        public void AddObserver(IObserver observer)
+        {
+            observers.Add(observer);
+        }
 
+        public void RemoveObserver(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        public void Notify()
+        {
+            foreach (var item in observers.ToList())
+            {
+                item.Update();
+            }
         }
         #endregion
+
+        internal ReportBankSingleton ReportBankSingleton
+        {
+            get => default;
+            set
+            {
+            }
+        }
     }
     class CComputer
     {
@@ -655,13 +688,13 @@ namespace BankConsole
                     return customerStartMoney / _dollarRateSell;
                 case CurrencyExchange.GrnToEuro:
                     return customerStartMoney / _euroRateSell;
-                case CurrencyExchange.DollarToGrn:
+                case CurrencyExchange.DolToGrn:
                     return customerStartMoney * _dollarRateBuy;
-                case CurrencyExchange.EuroToGrn:
+                case CurrencyExchange.EurToGrn:
                     return customerStartMoney * _euroRateBuy;
-                case CurrencyExchange.EuroToDollar:
+                case CurrencyExchange.EurToDollar:
                     return customerStartMoney / _dollarRateSell;
-                case CurrencyExchange.DollarToEuro:
+                case CurrencyExchange.DolToEuro:
                     return customerStartMoney * _dollarRateBuy;
                 default:
                     return 0;

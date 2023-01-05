@@ -3,20 +3,22 @@
   <Class Name="BankConsole.CBank" Collapsed="true">
     <Position X="4.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAABAAAAAA=</HashCode>
+      <HashCode>AABQAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAABAAAAAA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BankConsole.CClinerMan" Collapsed="true">
     <Position X="9.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAABAAAAAEAAQAAAAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <HashCode>AAAIAABAAAhAEAAQAAAgAAAAACAAAABAAAAAAAAACBA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="CVinnik" />
       <Property Name="CBank" />
+      <Property Name="ReportBankSingleton" />
     </ShowAsAssociation>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="BankConsole.CComputer" Collapsed="true">
     <Position X="0.75" Y="3.25" Width="1.5" />
@@ -43,17 +45,18 @@
       </Path>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAgAAAAAAAAQCAAQAAAAAAAAAAAAAAAAAAAAQgAAAAA=</HashCode>
+      <HashCode>AAwAAAAAAAAQCAAQBAAAAAAAAAAAAAAAAAAAQgAAAAA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="CBank" />
     </ShowAsAssociation>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="BankConsole.CEmployee" Collapsed="true">
     <Position X="2.75" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAgAAAEAAAAAQQAAAEARAAAAAAAAEAAAQIAAADhA=</HashCode>
+      <HashCode>AAAAAgAAAEAAAAAQQAAAEARAAAAAAAAEEAAQIAAADhA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -77,11 +80,14 @@
     </TypeIdentifier>
   </Class>
   <Class Name="BankConsole.ReportBankSingleton" Collapsed="true">
-    <Position X="0.75" Y="4.5" Width="1.5" />
+    <Position X="0.75" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AIAEAABAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAABAA=</HashCode>
+      <HashCode>AIAEAIAAAAAAAAAAAAAAQAAABAAAAAAQAAAAAAAABAA=</HashCode>
       <FileName>Program.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ReportBankSingleton1" />
+    </ShowAsAssociation>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>
